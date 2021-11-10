@@ -1,0 +1,13 @@
+{
+  "name": "@pixiechain/media",
+  "version": "0.0.1",
+  "private": false,
+  "dependencies": {
+    "bytebuffer": "^5.0.1"
+  },
+  "devDependencies": {
+    "@ethersproject/keccak256": "^5.0.6",
+    "@openzeppelin/contracts": "^3.2.0",
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0"
+  }
+}
