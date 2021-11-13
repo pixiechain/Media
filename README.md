@@ -2,6 +2,7 @@
 Pixie NFT contracts compatible with ERC721
 
 # Contract Address
+Pixie Official Public Testing Contract
 https://scan.chain.pixie.xyz/address/0xA335dD6f64EC53E0035786C020e1f187c790db42
 
 ## Architecture
