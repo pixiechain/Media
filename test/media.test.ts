@@ -41,7 +41,7 @@ describe('Project',  () => {
         })
 
         it("Deploy New", async ()=>{
-            const deployTx = await (await new factory.Media__factory(deployerWallet).deploy({ gasLimit: 5000000 })).deployed();
+            const deployTx = await (await new factory.Media__factory(deployerWallet).deploy("Media", "MEDIA", { gasLimit: 5000000 })).deployed();
             addressBook["Media"] = deployTx.address;
             console.log(addressBook);
             await fs.writeFile(sharedAddressPath, JSON.stringify(addressBook, null, 2));

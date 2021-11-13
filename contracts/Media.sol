@@ -28,12 +28,6 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     // To record the contract creator address
     address private _contractCreator;
 
-    // Address for the market
-    //address public marketContract;
-
-    // Mapping from token to previous owner of the token
-    //mapping(uint256 => address) public previousTokenOwners;
-
     // Mapping from token id to creator address
     mapping(uint256 => address) public tokenCreators;
 
@@ -43,23 +37,16 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     // Mapping from token id to sha256 hash of content
     mapping(uint256 => bytes32) public tokenContentHashes;
 
-    // Mapping from contentHash to bool
-    // mapping(bytes32 => bool) private _contentHashes;
-
+    // Mapping from contentHash to tokenID
     struct tokenID {
         uint256 value;
         bool isValid;
     }
-
     mapping(bytes32 => tokenID) private _contentHashes;
 
     //keccak256("Permit(address spender,uint256 tokenId,uint256 nonce,uint256 deadline)");
     bytes32 public constant PERMIT_TYPEHASH =
         0x49ecf333e5b8c95c40fdafc95c1ad136e8914a8fb55e9dc8bb01eaa83a2df9ad;
-
-    //keccak256("MintWithSig(bytes32 contentHash,bytes32 metadataHash,uint256 creatorShare,uint256 nonce,uint256 deadline)");
-    //bytes32 public constant MINT_WITH_SIG_TYPEHASH =
-    //    0x2952e482b8e2b192305f87374d7af45dc2eafafe4f50d26a0c02e90f2fdbe14b;
 
     //keccak256("MintWithSig(bytes32 contentHash,uint256 nonce,uint256 deadline)");
     bytes32 public constant MINT_WITH_SIG_TYPEHASH =
@@ -119,14 +106,9 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     }
 
     /**
-     * @notice On deployment, set the market contract address and register the
-     * ERC721 metadata interface
+     * @notice On deployment, set the media name and symbol
      */
-    // constructor(address marketContractAddr) public ERC721("Pixie", "PIXIE") {
-    //     marketContract = marketContractAddr;
-    //     _registerInterface(_INTERFACE_ID_ERC721_METADATA);
-    // }
-    constructor() ERC721("Pixie", "PIXIE") {
+    constructor(string memory n, string memory s) ERC721(n, s) {
        _contractCreator = msg.sender;
     }
     
@@ -142,26 +124,18 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * protocol does not support a base URI, so relevant conditionals are removed.
      * @return the URI for a token
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
+    function tokenURI(uint256 tokenId) public view override
         onlyExistingToken(tokenId)
         returns (string memory)
     {
-        string memory _tokenURI = _tokenURIs[tokenId];
-
-        return _tokenURI;
+        return _tokenURIs[tokenId];
     }
 
     /**
      * @notice get the tokenId given the content_hash if the token has been minted
      * @return the tokenId of the token
      */
-    function getTokenIdByContentHash(bytes32 contentHash)
-        public
-        view
-        returns (uint256)
+    function getTokenIdByContentHash(bytes32 contentHash) public view returns (uint256)
     {
         require(
             _contentHashes[contentHash].isValid == true,
@@ -177,41 +151,86 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      */
 
     /**
+     * @notice Burn a token.
+     * @dev Only callable if the media owner is also the creator.
+     */
+    function burn(uint256 tokenId) public override
+        nonReentrant
+        onlyExistingToken(tokenId)
+        onlyApprovedOrOwner(msg.sender, tokenId)
+    {
+        address owner = ownerOf(tokenId);
+
+        require(
+            tokenCreators[tokenId] == owner,
+            "Media: owner is not creator of media"
+        );
+
+        _burn(tokenId);
+    }
+
+    /**
+     * @dev Calculates EIP712 DOMAIN_SEPARATOR based on the current contract and chain ID.
+     */
+    function _calculateDomainSeparator() public view returns (bytes32) {
+        uint256 chainID;
+        /* solium-disable-next-line */
+        assembly {
+            chainID := chainid()
+        }
+
+        return
+            keccak256(
+                abi.encode(
+                    keccak256(
+                        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+                    ),
+                    keccak256(bytes("Pxbee")),
+                    keccak256(bytes("1")),
+                    chainID,
+                    address(this)
+                )
+            );
+    }
+
+    function exists(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
+    }
+
+    function creatorOf(uint256 tokenId) public view returns (address) {
+        return tokenCreators[tokenId];
+    }
+
+    /* ****************
+     * External Functions
+     * ****************
+     */
+
+    /**
      * @notice see IMedia
      */
     //function mint(MediaData memory data, IMarket.BidShares memory bidShares)
-    function mint(uint256 tokenId, MediaData memory data)
-        public
-        override
+    function mint(uint256 tokenId, MediaData memory data) external override
         nonReentrant
     {
-        //_mintForCreator(msg.sender, data, bidShares);
         _mintForCreator(msg.sender, tokenId, data);
     }
 
     /**
      * @notice see IMedia
      */
-    //function mintForCreator(address creator, MediaData memory data, IMarket.BidShares memory bidShares)
-    function mintForCreator(address creator, uint256 tokenId, MediaData memory data)
-        public
-        override
+    function mintForCreator(address creator, uint256 tokenId, MediaData memory data) external override
         nonReentrant
     {
-        //_mintForCreator(creator, data, bidShares);
         _mintForCreator(creator, tokenId, data);
     }
 
     /**
      * @notice see IMedia
      */
-    function mintWithSig(
-        address creator,
-        uint256 tokenId,
-        MediaData memory data,
-        //IMarket.BidShares memory bidShares,
-        EIP712Signature memory sig
-    ) public override nonReentrant {
+    function mintWithSig(address creator, uint256 tokenId, MediaData memory data, EIP712Signature memory sig) external override
+        nonReentrant 
+    {
         require(
             sig.deadline == 0 || sig.deadline >= block.timestamp,
             "Media: mintWithSig expired"
@@ -243,29 +262,7 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
             "Media: Signature invalid"
         );
 
-        //_mintForCreator(recoveredAddress, data, bidShares);
         _mintForCreator(recoveredAddress, tokenId, data);
-    }
-
-    /**
-     * @notice Burn a token.
-     * @dev Only callable if the media owner is also the creator.
-     */
-    function burn(uint256 tokenId)
-        public
-        override
-        nonReentrant
-        onlyExistingToken(tokenId)
-        onlyApprovedOrOwner(msg.sender, tokenId)
-    {
-        address owner = ownerOf(tokenId);
-
-        require(
-            tokenCreators[tokenId] == owner,
-            "Media: owner is not creator of media"
-        );
-
-        _burn(tokenId);
     }
 
     /**
@@ -274,7 +271,9 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * In instances where a 3rd party is interacting on a user's behalf via `permit`, they should
      * revoke their approval once their task is complete as a best practice.
      */
-    function revokeApproval(uint256 tokenId) external override nonReentrant {
+    function revokeApproval(uint256 tokenId) external override 
+        nonReentrant 
+    {
         require(
             msg.sender == getApproved(tokenId),
             "Media: caller not approved address"
@@ -286,9 +285,7 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * @notice see IMedia
      * @dev only callable by approved or owner
      */
-    function updateTokenURI(uint256 tokenId, string calldata _tokenURI)
-        external
-        override
+    function updateTokenURI(uint256 tokenId, string calldata _tokenURI) external override
         nonReentrant
         onlyApprovedOrOwner(msg.sender, tokenId)
         onlyTokenWithContentHash(tokenId)
@@ -303,11 +300,10 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * @dev This method is loosely based on the permit for ERC-20 tokens in  EIP-2612, but modified
      * for ERC-721.
      */
-    function permit(
-        address spender,
-        uint256 tokenId,
-        EIP712Signature memory sig
-    ) public override nonReentrant onlyExistingToken(tokenId) {
+    function permit(address spender, uint256 tokenId, EIP712Signature memory sig) external override 
+        nonReentrant 
+        onlyExistingToken(tokenId) 
+    {
         require(
             sig.deadline == 0 || sig.deadline >= block.timestamp,
             "Media: Permit expired"
@@ -357,17 +353,13 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      *
      * On mint, also set the sha256 hashes of the content for integrity
      * checks, along with the initial URIs to point to the content. Attribute
-     * the token ID to the creator, mark the content hash as used, and set the bid shares for
-     * the media's market.
+     * the token ID to the creator, mark the content hash as used.
      *
      * Note that the content hash must be unique for future mints to prevent duplicate media.
      */
-    function _mintForCreator(
-        address creator,
-        uint256 tokenId,
-        MediaData memory data
-        //IMarket.BidShares memory bidShares
-    ) internal onlyValidURI(data.tokenURI) {
+    function _mintForCreator(address creator, uint256 tokenId, MediaData memory data) internal 
+        onlyValidURI(data.tokenURI) 
+    {
         require(msg.sender == _contractCreator, "Meida: Only contract creator can mint");
         require(data.contentHash != 0, "Media: content hash must be non-zero");
         require(
@@ -387,13 +379,9 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
         _contentHashes[data.contentHash].isValid = true;
 
         tokenCreators[tokenId] = creator;
-        //previousTokenOwners[tokenId] = creator;
-        //IMarket(marketContract).setBidShares(tokenId, bidShares);
     }
 
-    function _setTokenContentHash(uint256 tokenId, bytes32 contentHash)
-        internal
-        virtual
+    function _setTokenContentHash(uint256 tokenId, bytes32 contentHash) internal virtual
         onlyExistingToken(tokenId)
     {
         tokenContentHashes[tokenId] = contentHash;
@@ -413,54 +401,12 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
         if (bytes(_tokenURI).length != 0) {
             _tokenURIs[tokenId] = _tokenURI;
         }
-
-        //delete previousTokenOwners[tokenId];
     }
 
     /**
      * @notice transfer a token and remove the ask for it.
      */
-    function _transfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override {
-        //IMarket(marketContract).removeAsk(tokenId);
-
+    function _transfer(address from, address to, uint256 tokenId) internal override {
         super._transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev Calculates EIP712 DOMAIN_SEPARATOR based on the current contract and chain ID.
-     */
-    function _calculateDomainSeparator() public view returns (bytes32) {
-        uint256 chainID;
-        /* solium-disable-next-line */
-        assembly {
-            chainID := chainid()
-        }
-
-        return
-            keccak256(
-                abi.encode(
-                    keccak256(
-                        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-                    ),
-                    keccak256(bytes("Pxbee")),
-                    keccak256(bytes("1")),
-                    chainID,
-                    address(this)
-                )
-            );
-    }
-
-    function exists(uint256 tokenId) public view returns (bool) 
-    {
-        return _exists(tokenId);
-    }
-
-    function creatorOf(uint256 tokenId) public view returns (address) 
-    {
-        return tokenCreators[tokenId];
     }
 }
