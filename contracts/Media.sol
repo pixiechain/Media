@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.4;
 
 import {ERC721Burnable} from "./ERC721Burnable.sol";
 import {ERC721} from "./ERC721.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Math} from "@openzeppelin/contracts/math/Math.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {Decimal} from "./Decimal.sol";
 import "./interfaces/IMedia.sol";
 
@@ -19,6 +18,7 @@ import "./interfaces/IMedia.sol";
  */
 contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     using SafeMath for uint256;
+    using EnumerableSet for EnumerableSet.UintSet;
 
     /* *******
      * Globals
@@ -71,15 +71,6 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     // Mapping from address to mint with sig nonce
     mapping(address => uint256) public mintWithSigNonces;
 
-    /*
-     *     bytes4(keccak256('name()')) == 0x06fdde03
-     *     bytes4(keccak256('symbol()')) == 0x95d89b41
-     *     bytes4(keccak256('tokenURI(uint256)')) == 0xc87b56dd
-     *
-     *     => 0x06fdde03 ^ 0x95d89b41 ^ 0xc87b56dd == 0x5b5e139f
-     */
-    bytes4 private constant _INTERFACE_ID_ERC721_METADATA = 0x5b5e139f;
-
     /* *********
      * Modifiers
      * *********
@@ -131,8 +122,11 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * @notice On deployment, set the market contract address and register the
      * ERC721 metadata interface
      */
-    constructor() public ERC721("Pixie", "PIXIE") {
-        _registerInterface(_INTERFACE_ID_ERC721_METADATA);
+    // constructor(address marketContractAddr) public ERC721("Pixie", "PIXIE") {
+    //     marketContract = marketContractAddr;
+    //     _registerInterface(_INTERFACE_ID_ERC721_METADATA);
+    // }
+    constructor() ERC721("Pixie", "PIXIE") {
        _contractCreator = msg.sender;
     }
     
@@ -388,7 +382,7 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
         _safeMint(creator, tokenId);
         _setTokenContentHash(tokenId, data.contentHash);
         _setTokenURI(tokenId, data.tokenURI);
-        _creatorTokens[creator].add(tokenId);
+        EnumerableSet.add(_creatorTokens[creator], tokenId);
         _contentHashes[data.contentHash].value = tokenId;
         _contentHashes[data.contentHash].isValid = true;
 

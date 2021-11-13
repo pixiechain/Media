@@ -17,3 +17,4 @@ cache
 artifacts
 typechain
 dist/
+contracts_flattened

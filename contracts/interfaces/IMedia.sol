@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: MIT
-
-pragma solidity 0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.4;
 
 /**
- * @title Interface for Pxbee Protocol's Media
+ * @title Interface for Pixie Protocol's Media
  */
 interface IMedia {
     struct EIP712Signature {
@@ -26,19 +24,16 @@ interface IMedia {
     /**
      * @notice Mint new media for msg.sender.
      */
-    //function mint(MediaData calldata data, IMarket.BidShares calldata bidShares) external;
     function mint(uint256 tokenId, MediaData calldata data) external;
 
     /**
      * @notice Mint new media for creator.
      */
-    //function mintForCreator(address creator, MediaData calldata data, IMarket.BidShares calldata bidShares) external;
     function mintForCreator(address creator, uint256 tokenId, MediaData calldata data) external;
 
     /**
      * @notice EIP-712 mintWithSig method. Mints new media for a creator given a valid signature.
      */
-    //function mintWithSig(address creator, MediaData calldata data, IMarket.BidShares calldata bidShares, EIP712Signature calldata sig) external;
     function mintWithSig(address creator, uint256 tokenId, MediaData calldata data, EIP712Signature calldata sig) external;
 
     /**

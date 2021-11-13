@@ -2,12 +2,87 @@
   "name": "@pixiechain/media",
   "version": "0.0.1",
   "private": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "./dist/**/*",
+    "./dist/*"
+  ],
+  "scripts": {
+    "deploy": "ts-node scripts/deploy.ts",
+    "mint": "ts-node scripts/mint.ts",
+    "mediaInfo": "ts-node scripts/mediaInfo.ts",
+    "build": "yarn build:contracts && yarn build:package",
+    "prepublishOnly": "yarn build",
+    "test": "hardhat test",
+    "compile": "yarn hardhat clean && yarn hardhat compile",
+    "typechain": "rm -rf ./typechain && typechain --show-stack-traces --target ethers-v5 --out-dir ./typechain 'artifacts/!(build-info)/**/!(*.dbg*)*.json'",
+    "build:contracts": "yarn compile",
+    "build:package": "rm -rf ./dist && tsc --build && cp typechain/*.d.ts dist/typechain && cp -R artifacts/contracts dist/artifacts && cp -R contracts dist",
+    "chain": "ganache-cli --networkId 50 --accounts 20 -e 10000000000 -l 10000000 -m 'concert load couple harbor equip island argue ramp clarify fence smart topic'",
+    "watch": "ts-node scripts/watch.ts",
+    "flatten": "hardhat flatten ./contracts/${npm_config_name}.sol > ./contracts_flattened/${npm_config_name}.sol"
+  },
   "dependencies": {
-    "bytebuffer": "^5.0.1"
+    "@steemit/rpc-auth": "^1.1.0",
+    "@types/express": "^4.17.13",
+    "@types/request": "^2.48.7",
+    "bigi": "^1.4.2",
+    "bytebuffer": "^5.0.1",
+    "detect-node": "^2.0.3",
+    "ecurve": "^1.0.5",
+    "ethers": "^5.4.6",
+    "hardhat-change-network": "^0.0.7",
+    "mysql": "^2.18.1",
+    "retry": "^0.13.1",
+    "secure-random": "^1.1.1",
+    "ws": "^8.2.2"
   },
   "devDependencies": {
-    "@ethersproject/keccak256": "^5.0.6",
-    "@openzeppelin/contracts": "^3.2.0",
-    "@openzeppelin/contracts-ethereum-package": "^3.0.0"
+    "@ethersproject/keccak256": "^5.4.0",
+    "@nomiclabs/buidler": "^1.999.0",
+    "@nomiclabs/buidler-ethers": "^2.0.2",
+    "@nomiclabs/buidler-waffle": "^2.1.0",
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0",
+    "@typechain/ethers-v5": "^7.1.0",
+    "@typechain/hardhat": "^2.3.0",
+    "@types/chai": "^4.2.21",
+    "@types/chai-as-promised": "^7.1.3",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.9.1",
+    "buidler-typechain": "^0.2.2",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chokidar": "^3.5.2",
+    "dotenv": "^10.0.0",
+    "eth-sig-util": "^3.0.1",
+    "ethereum-waffle": "^3.4.0",
+    "ethereumjs-util": "^7.1.0",
+    "fs-extra": "^10.0.0",
+    "ganache-cli": "^6.12.0",
+    "hardhat": "^2.6.4",
+    "hardhat-deploy": "^0.9.1",
+    "husky": ">=7.0.2",
+    "lint-staged": ">=11.1.2",
+    "minimist": "^1.2.5",
+    "prettier": "^2.4.0",
+    "prettier-plugin-solidity": "^1.0.0-beta.18",
+    "system-commands": "^1.1.7",
+    "ts-generator": "^0.1.1",
+    "ts-node": "^10.2.1",
+    "typechain": "^5.1.2",
+    "typechain-target-ethers": "^1.0.4",
+    "typescript": "^4.4.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,md,sol}": "prettier --write"
   }
 }

@@ -13,8 +13,7 @@
     limitations under the License.
 */
 
-pragma solidity 0.6.8;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.4;
 
 /**
  * NOTE: This file is a clone of the dydx protocol's Decimal.sol contract. It was forked from https://github.com/dydxprotocol/solo
@@ -23,8 +22,8 @@ pragma experimental ABIEncoderV2;
  * It has not been modified other than to use a newer solidity in the pragma to match the rest of the contract suite of this project
  */
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Math} from "./Math.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import {DecimalMath} from "./DecimalMath.sol";
 
 /**
  * @title Decimal
@@ -60,7 +59,7 @@ library Decimal {
         pure
         returns (uint256)
     {
-        return Math.getPartial(target, d.value, BASE);
+        return DecimalMath.getPartial(target, d.value, BASE);
     }
 
     function div(uint256 target, D256 memory d)
@@ -68,6 +67,6 @@ library Decimal {
         pure
         returns (uint256)
     {
-        return Math.getPartial(target, BASE, d.value);
+        return DecimalMath.getPartial(target, BASE, d.value);
     }
 }

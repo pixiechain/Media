@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
 
 /**
  * NOTE: This file is a clone of the OpenZeppelin ERC721Burnable.sol contract. It was forked from https://github.com/OpenZeppelin/openzeppelin-contracts
@@ -7,9 +8,7 @@
  * It was cloned in order to ensure it imported from the cloned ERC721.sol file. No other modifications have been made.
  */
 
-pragma solidity 0.6.8;
-
-import "@openzeppelin/contracts/GSN/Context.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "./ERC721.sol";
 
 /**

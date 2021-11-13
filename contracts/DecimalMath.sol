@@ -1,11 +1,10 @@
-// SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.6.8;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
- * @title Math
+ * @title DecimalMath
  *
  * Library for non-standard Math functions
  * NOTE: This file is a clone of the dydx protocol's Decimal.sol contract.
@@ -13,7 +12,7 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
  * 2d8454e02702fe5bc455b848556660629c3cad36. It has not been modified other than to use a
  * newer solidity in the pragma to match the rest of the contract suite of this project.
  */
-library Math {
+library DecimalMath {
     using SafeMath for uint256;
 
     // ============ Library Functions ============

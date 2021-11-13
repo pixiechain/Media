@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
 
 /**
  * NOTE: This file is a clone of the OpenZeppelin ERC721.sol contract. It was forked from https://github.com/OpenZeppelin/openzeppelin-contracts
@@ -8,23 +9,20 @@
  * The following functions needed to be modified, prompting this clone:
  *  - `_tokenURIs` visibility was changed from private to internal to support updating URIs after minting
  *  - `_baseURI` visibiility was changed from private to internal to support fetching token URI even after the token was burned
- *  - `_INTERFACE_ID_ERC721_METADATA` is no longer registered as an interface because _tokenURI now returns raw content instead of a JSON file, and supports updatable URIs
  *  - `_approve` visibility was changed from private to internal to support EIP-2612 flavored permits and approval revocation by an approved address
  */
 
-pragma solidity 0.6.8;
-
-import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/introspection/ERC165.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@openzeppelin/contracts/utils/EnumerableMap.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 
 /**
  * @title ERC721 Non-Fungible Token Standard basic implementation
@@ -43,6 +41,12 @@ contract ERC721 is
     using EnumerableMap for EnumerableMap.UintToAddressMap;
     using Strings for uint256;
 
+    // Token name
+    string private _name;
+
+    // Token symbol
+    string private _symbol;
+
     // Equals to `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`
     // which can be also obtained as `IERC721Receiver(0).onERC721Received.selector`
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
@@ -59,11 +63,6 @@ contract ERC721 is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    // Token name
-    string private _name;
-
-    // Token symbol
-    string private _symbol;
 
     // Optional mapping for token URIs
     mapping(uint256 => string) internal _tokenURIs;
@@ -99,13 +98,20 @@ contract ERC721 is
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
      */
-    constructor(string memory name, string memory symbol) public {
-        _name = name;
-        _symbol = symbol;
+    constructor(string memory n, string memory s) {
+        _name = n;
+        _symbol = s;
+    }
 
-        // register the supported interfaces to conform to ERC721 via ERC165
-        _registerInterface(_INTERFACE_ID_ERC721);
-        _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return
+            interfaceId == _INTERFACE_ID_ERC721 || //type(IERC721).interfaceId ||
+            interfaceId == _INTERFACE_ID_ERC721_ENUMERABLE ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     /**
