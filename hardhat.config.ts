@@ -41,7 +41,7 @@ const config: HardhatUserConfig = {
     pixie_test: {
       url: "https://http-testnet.chain.pixie.xyz",
       accounts: [
-        '0x986ad5a63c8fbb38fe3fcfa27948bb05828584b14a491cc7e411a606832eba22',
+        '0x4197fedd3febad4df4afa1bc370de9c6e64b2b764735f3bb1f269182c67a27a6',
         '0x038fea60b6994a873e47ae64416abc8d5c74387eb502166e89b1580b79293cb1'
       ]
     },
