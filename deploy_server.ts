@@ -1,6 +1,6 @@
 //use hardhat network to debug
 //npx hardhat node
-//npx hardhat run log_server.ts --network hard
+//npx hardhat run deploy_server.ts --network hard
 
 //use ts-node
 //TS_NODE_FILES=1 ts-node deploy_server.ts --network hard
