@@ -43,6 +43,7 @@ app.post('/api/v1/contracts/deploy', async (req, res) => {
 		let e = "can not deploy new contract without name and symbol";
         console.warn(e);
         res.send({status:false, err:e});
+        return;
 	}
 
     var logTime = new Date();
