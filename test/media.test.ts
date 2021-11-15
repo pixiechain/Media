@@ -66,5 +66,41 @@ describe('Project',  () => {
             console.log(`Media #123 uri:`);
             console.log(uri);
         }).timeout(30000);
+
+        it("duplicate tokenID mint", async ()=>{
+            const media = await operateMediaAs(deployerWallet);
+            let res = await media.mint(123,
+                {
+                    "tokenURI":"http://api-test.pxbee.com/test/a/c/money?id=abcdedffafd",
+                    "contentHash":"0xdd7661A473409D7D5D6804A51C1451184FBD9D564232E3181E17CF7EF39B8C1C"
+                });
+            await expect(res.wait()).eventually.rejected;
+        }).timeout(30000);
+
+        it("duplicate content hash mint", async ()=>{
+            const media = await operateMediaAs(deployerWallet);
+            let res = await media.mint(333,
+                {
+                    "tokenURI":"http://api-test.pxbee.com/test/a/c/money?id=abcdedffafd",
+                    "contentHash":"0xC27661A473409D7D5D6804A51C1451184FBD9D564232E3181E17CF7EF39B8C1C"
+                });
+            await expect(res.wait()).eventually.rejected;
+        }).timeout(30000);
+
+        it("finalization", async ()=>{
+            const media = await operateMediaAs(deployerWallet);
+            let res = await media.finalize();
+            await expect(res.wait()).eventually.fulfilled;
+
+            let supply = await media.totalSupply();
+            console.log(`Supply: ${supply}`);
+
+            res = await media.mint(321,
+                {
+                    "tokenURI":"http://api-test.pxbee.com/test/a/c/money?id=321",
+                    "contentHash":"0x127661A473409D7D5D6804A51C1451184FBD9D564232E3181E17CF7EF39B8C1C"
+                });
+            await expect(res.wait()).eventually.rejected;
+        }).timeout(30000);
     })
 });

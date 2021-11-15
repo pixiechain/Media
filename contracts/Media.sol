@@ -58,6 +58,9 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     // Mapping from address to mint with sig nonce
     mapping(address => uint256) public mintWithSigNonces;
 
+    // Finalization state, only false can permit mint
+    bool public finalization = false;
+
     /* *********
      * Modifiers
      * *********
@@ -102,6 +105,14 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
             bytes(uri).length != 0,
             "Media: specified uri must be non-empty"
         );
+        _;
+    }
+
+    /**
+     * @notice Ensure that the collection of this contract is finalization, and can not mint any more.
+     */
+    modifier onlyMintAvailable() {
+        require(finalization == false, "Media: mint function is not available.");
         _;
     }
 
@@ -339,6 +350,13 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
         _approve(spender, tokenId);
     }
 
+    function finalize() external
+    {
+        require(msg.sender == _contractCreator, "Meida: Only contract creator can finalize supply");
+        require(finalization == false, "Meida: Already finalized");
+        finalization = true;
+    }
+
     /* *****************
      * Private Functions
      * *****************
@@ -358,6 +376,7 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * Note that the content hash must be unique for future mints to prevent duplicate media.
      */
     function _mintForCreator(address creator, uint256 tokenId, MediaData memory data) internal 
+        onlyMintAvailable
         onlyValidURI(data.tokenURI) 
     {
         require(msg.sender == _contractCreator, "Meida: Only contract creator can mint");
