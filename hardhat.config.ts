@@ -45,6 +45,11 @@ const config: HardhatUserConfig = {
         '0x038fea60b6994a873e47ae64416abc8d5c74387eb502166e89b1580b79293cb1'
       ]
     },
+    pixie: {
+      url: "https://http-mainnet.chain.pixie.xyz",
+      accounts: [
+      ]
+    },
     hard: {
       url: "http://127.0.0.1:8545"
     }
