@@ -787,6 +787,34 @@ app.post('/api/v1/contracts/burn', async (req, res) => {
     };
 });
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/api/v1/contracts/finalize', async (req, res) => {
+    let type = req.body.type;
+    let contract_address : any = req.body.contract_address;
+    let pk = req.body.pk;
+
+    let provider : any;
+    let wallet : any;
+    try {
+		provider = await ethers.provider;
+        wallet = new Wallet(`0x${pk}`, provider);    
+    } catch(err) {
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+
+    try {
+        const media = Media__factory.connect(contract_address, wallet);
+        const finalize_res = await media.finalize({ gasLimit: 5000000 });
+        let receipt = await finalize_res.wait();
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] finalize ${contract_address} successfully!`);
+        res.send(receipt);
+
+    } catch(err) {
+        res.send({status:false, err:err.toString()});
+    };
+});
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 app.get('/api/v1/contracts/info', async (req, res) => {
 	let type = req.query.type;
     let contractAddress : any = req.query.contractAddress;

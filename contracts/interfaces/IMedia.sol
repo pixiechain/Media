@@ -50,4 +50,9 @@ interface IMedia {
      * @notice EIP-712 permit method. Sets an approved spender given a valid signature.
      */
     function permit(address spender, uint256 tokenId, EIP712Signature calldata sig) external;
+
+    /**
+     * @notice finalize this contract and can not mint any more.
+     */
+    function finalize() external;
 }

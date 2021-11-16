@@ -350,7 +350,10 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
         _approve(spender, tokenId);
     }
 
-    function finalize() external
+    /**
+     * @notice See IMedia
+     */
+    function finalize() external override
     {
         require(msg.sender == _contractCreator, "Meida: Only contract creator can finalize supply");
         require(finalization == false, "Meida: Already finalized");
