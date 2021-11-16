@@ -15,11 +15,7 @@ import { Wallet } from '@ethersproject/wallet';
 import { Media__factory } from './typechain/factories/Media__factory';
 import Decimal from './utils/Decimal';
 import {
-    approveCurrency,
-    deployCurrency,
     EIP712Sig,
-    getBalance,
-    mintCurrency,
     signMintWithSig,
     signPermit,
     toNumWei
