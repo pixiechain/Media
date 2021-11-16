@@ -918,6 +918,35 @@ app.get('/api/v1/contracts/tokenIdByContentHash', async (req, res) => {
         res.send({status:false, err:err.toString()});
     };
 });
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+app.get('/api/v1/contracts/mintStatus', async (req, res) => {
+	let type = req.query.type;
+    let tx: any = req.query.tx;
+    let provider = await ethers.provider;
+
+    try {
+        let receipt = await provider.getTransactionReceipt(tx);
+
+        if (receipt !== null) {
+            console.log(receipt);
+            if(receipt.status == 1 && receipt.logs[0]!=undefined) {
+                var new_token_id = receipt.logs[0].topics[3];
+                receipt["token_id"] = ethers.BigNumber.from(new_token_id).toString();
+                var logTime = new Date();
+                console.log(`[${logTime.toLocaleTimeString()}] mintStatus: mint ${receipt["token_id"]} successfully!`);
+            }
+            res.send(receipt);
+        }
+        else {
+            res.send({status:false});
+        }
+    } catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] mintStatus failed!`);
+        console.log(err.toString());
+        res.send({status:false, err:err.toString()});
+    };
+});
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 app.use(async (err, req, res, next)=>{
     let err_msg = err.toString();
