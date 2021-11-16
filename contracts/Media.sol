@@ -13,8 +13,7 @@ import "./interfaces/IMedia.sol";
 
 /**
  * @title A media value system, with perpetual equity to creators
- * @notice This contract provides an interface to mint media with a market
- * owned by the creator.
+ * @notice This contract provides an interface to mint Pixie media.
  */
 contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     using SafeMath for uint256;
@@ -258,7 +257,6 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
                         abi.encode(
                             MINT_WITH_SIG_TYPEHASH,
                             data.contentHash,
-                            //bidShares.creator.value,
                             mintWithSigNonces[creator]++,
                             sig.deadline
                         )
