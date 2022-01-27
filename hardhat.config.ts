@@ -50,6 +50,13 @@ const config: HardhatUserConfig = {
       accounts: [
       ]
     },
+    polygon_test: {
+      url: "https://matic-mumbai.chainstacklabs.com",
+      accounts: [
+        '0x0ec2f76b144cae87ccbb71fc3c7122853d896cbe35bf7e06129614e1c3407f19',
+        '0x8d5ddbc646eba29fec1f8a2f8138367907774ce6c976a892eeaf4bbdd4bd5cd1'
+      ]
+    },
     hard: {
       url: "http://127.0.0.1:8545"
     }
