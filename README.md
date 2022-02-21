@@ -1,5 +1,5 @@
 # Media
-Pixie NFT contracts compatible with ERC721
+Pixie NFT contracts compatible with ERC721 and ERC1155
 
 # Contract Address
 Pixie Official Public Testing Contract
