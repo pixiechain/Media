@@ -17,7 +17,7 @@ function delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
 }
 
-describe('Project',  () => {
+describe('Project Media',  () => {
 
     let deployerWallet:Signer;
     let actor0Wallet:Signer;

@@ -13,6 +13,7 @@ import { BigNumber } from 'ethers'; //https://docs.ethers.io/v5/
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
 import { Media__factory } from './typechain/factories/Media__factory';
+import { Media1155__factory } from './typechain/factories/Media1155__factory';
 import Decimal from './utils/Decimal';
 import {
     arrayify,
@@ -66,6 +67,34 @@ app.post('/api/v1/contracts/deploy', async (req, res) => {
 	} catch(err) {
         var logTime = new Date();
         console.log(`[${logTime.toLocaleTimeString()}] deploy ${name}(${symbol}) error!`);
+        console.log(err.toString());
+        res.send({status:false, err:err.toString()});
+        return;
+    };
+});
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+app.post('/api/v1/contracts/deploy1155', async (req, res) => {
+    console.log(req.body);
+    req.body = req.body?req.body:{};
+
+    var logTime = new Date();
+    console.log(`[${logTime.toLocaleTimeString()}] new Media1155 contract...`);
+
+    try {
+		let provider = await ethers.provider;
+		const [wallet] = await ethers.getSigners();
+		const deployTx = await (await new Media1155__factory(wallet).deploy({ gasLimit: 5000000 })).deployed();
+		logTime = new Date();
+		console.log(`[${logTime.toLocaleTimeString()}] Media1155 has been deployed at ${deployTx.address}.`);
+
+		res.send({
+            "status" : true,
+			"address" : deployTx.address
+		});
+        return;
+	} catch(err) {
+        var logTime = new Date();
+        console.log(`[${logTime.toLocaleTimeString()}] deploy1155 error!`);
         console.log(err.toString());
         res.send({status:false, err:err.toString()});
         return;
