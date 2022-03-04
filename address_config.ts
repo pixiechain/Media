@@ -6,6 +6,8 @@ function getContractAddressBookByType(type) {
 		return "pixie_test";
     else if(type == "polygon_test")
         return "polygon_test";
+    else if(type == "polygon")
+        return "polygon";
     else if(type == "hard")
         return "hard";
     else
