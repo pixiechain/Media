@@ -24,9 +24,6 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * *******
      */
 
-    // To record the contract creator address
-    address private _contractCreator;
-
     // Mapping from token id to creator address
     mapping(uint256 => address) public tokenCreators;
 
@@ -59,6 +56,8 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
 
     // Finalization state, only false can permit mint
     bool public finalization = false;
+
+    string private _contractURI;
 
     /* *********
      * Modifiers
@@ -119,7 +118,6 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * @notice On deployment, set the media name and symbol
      */
     constructor(string memory n, string memory s) ERC721(n, s) {
-       _contractCreator = msg.sender;
     }
     
     /* **************
@@ -159,6 +157,11 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * Public Functions
      * ****************
      */
+
+    //https://docs.opensea.io/docs/contract-level-metadata
+    function contractURI() public view returns (string memory) {
+        return _contractURI;
+    }
 
     /**
      * @notice Burn a token.
@@ -215,6 +218,12 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * External Functions
      * ****************
      */
+
+    function changeContractURI(string memory _uri) external
+        onlyOwner
+    {
+        _contractURI = _uri;
+    }
 
     /**
      * @notice see IMedia
@@ -352,8 +361,8 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
      * @notice See IMedia
      */
     function finalize() external override
+        onlyOwner
     {
-        require(msg.sender == _contractCreator, "Meida: Only contract creator can finalize supply");
         require(finalization == false, "Meida: Already finalized");
         finalization = true;
     }
@@ -379,8 +388,8 @@ contract Media is IMedia, ERC721Burnable, ReentrancyGuard {
     function _mintForCreator(address creator, uint256 tokenId, MediaData memory data) internal 
         onlyMintAvailable
         onlyValidURI(data.tokenURI) 
+        onlyOwner
     {
-        require(msg.sender == _contractCreator, "Meida: Only contract creator can mint");
         require(data.contentHash != 0, "Media: content hash must be non-zero");
         require(
             _contentHashes[data.contentHash].isValid == false,
