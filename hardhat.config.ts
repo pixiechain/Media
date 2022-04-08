@@ -51,10 +51,20 @@ const config: HardhatUserConfig = {
       ]
     },
     polygon_test: {
-      url: "https://matic-mumbai.chainstacklabs.com",
+      url: "https://rpc-mumbai.maticvigil.com",
       accounts: [
-        '0x0ec2f76b144cae87ccbb71fc3c7122853d896cbe35bf7e06129614e1c3407f19',
+        '0x836a96a33158635ece6ac15a2becb1461bd1c244e8f26bba2ec56ad62b1f1f44',
         '0x8d5ddbc646eba29fec1f8a2f8138367907774ce6c976a892eeaf4bbdd4bd5cd1'
+      ]
+    },
+    polygon: {
+      url: "https://polygon-rpc.com",
+      accounts: [
+      ]      
+    },
+    eth: {
+      url: "https://mainnet.infura.io/v3/e8996d3f13d940de8bcb0602ac35d293",
+      accounts: [
       ]
     },
     hard: {

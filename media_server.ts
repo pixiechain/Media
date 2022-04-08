@@ -48,6 +48,10 @@ function getChainIdByType(type) {
         return 666;
     else if(type == "polygon_test")
         return 80001;
+    else if(type == "polygon")
+        return 137;
+    else if(type == "eth")
+        return 1;
     else if(type == "hard")
         return 256;
     else
