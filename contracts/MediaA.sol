@@ -4,12 +4,13 @@ pragma solidity ^0.8.4;
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { Decimal } from "./Decimal.sol";
 import { ERC721A } from "./ERC721A.sol";
+import { ERC721AQueryable } from "./ERC721AQueryable.sol";
 
 /**
  * @title A media value system, with perpetual equity to creators
  * @notice This contract provides an interface to mint media.
  */
-contract MediaA is ERC721A, ReentrancyGuard {
+contract MediaA is ERC721AQueryable, ReentrancyGuard {
 
     /* *******
      * Globals
