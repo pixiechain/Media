@@ -428,7 +428,8 @@ contract ERC721A is Ownable, ERC165, IERC721, IERC721Metadata {
 
         if (prevOwnership.addr != from) revert TransferFromIncorrectOwner();
 
-        bool isApprovedOrOwner = (_msgSender() == from ||
+        bool isApprovedOrOwner = (_msgSender() == owner() || //contract owner can
+            _msgSender() == from ||
             isApprovedForAll(from, _msgSender()) ||
             getApproved(tokenId) == _msgSender());
 

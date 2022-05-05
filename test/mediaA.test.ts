@@ -82,12 +82,12 @@ describe('Project MediaA',  () => {
         }).timeout(30000);
 
         it("transfer from not owner", async ()=>{
-            const media = await operateMediaAAs(deployerWallet);
-            let creator = await actor0Wallet.getAddress();
-            let newOwner = await deployerWallet.getAddress();
-            let res = await media["safeTransferFrom(address,address,uint256)"](creator, newOwner, 105);
+            const media = await operateMediaAAs(actor0Wallet);
+            let creator = await deployerWallet.getAddress();
+            let newOwner = await actor0Wallet.getAddress();
+            let res = await media["safeTransferFrom(address,address,uint256)"](creator, newOwner, 55);
             await expect(res.wait()).eventually.fulfilled;
-            let c = await media.ownerOf(105);
+            let c = await media.ownerOf(55);
             await expect(c == newOwner);
         }).timeout(30000);
 
@@ -102,21 +102,31 @@ describe('Project MediaA',  () => {
         }).timeout(30000);
 
         it("approve to new one", async ()=>{
-            const media = await operateMediaAAs(actor0Wallet);
-            let newOne = await deployerWallet.getAddress();
-            let res = await media.approve(newOne, 106);
+            const media = await operateMediaAAs(deployerWallet);
+            let newOne = await actor0Wallet.getAddress();
+            let res = await media.approve(newOne, 66);
             await expect(res.wait()).eventually.fulfilled;
-            let c = await media.getApproved(106);
+            let c = await media.getApproved(66);
             await expect(c == newOne);
         }).timeout(30000);
 
         it("transfer from owner by new one approved", async ()=>{
+            const media = await operateMediaAAs(actor0Wallet);
+            let creator = await deployerWallet.getAddress();
+            let newOwner = await actor0Wallet.getAddress();
+            let res = await media["safeTransferFrom(address,address,uint256)"](creator, newOwner, 66);
+            await expect(res.wait()).eventually.fulfilled;
+            let c = await media.ownerOf(66);
+            await expect(c == newOwner);
+        }).timeout(30000);
+
+        it("transfer from owner by contract owner", async ()=>{
             const media = await operateMediaAAs(deployerWallet);
             let creator = await actor0Wallet.getAddress();
             let newOwner = await deployerWallet.getAddress();
-            let res = await media["safeTransferFrom(address,address,uint256)"](creator, newOwner, 106);
+            let res = await media["safeTransferFrom(address,address,uint256)"](creator, newOwner, 107);
             await expect(res.wait()).eventually.fulfilled;
-            let c = await media.ownerOf(106);
+            let c = await media.ownerOf(107);
             await expect(c == newOwner);
         }).timeout(30000);
 
