@@ -1,9 +1,9 @@
 //use hardhat network to debug
 //npx hardhat node
-//npx hardhat run media_server.ts --network hard
+//npx hardhat run media_server_A.ts --network hard
 
 //use ts-node
-//TS_NODE_FILES=1 ts-node media_server.ts --network hard
+//TS_NODE_FILES=1 ts-node media_server_A.ts --network hard
 
 import * as env from "hardhat";
 import { ethers } from "hardhat";
